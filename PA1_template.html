@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+
+<title>Reproducible Research Project 1</title>
+
+<script type="text/javascript">
+window.onload = function() {
+  var imgs = document.getElementsByTagName('img'), i, img;
+  for (i = 0; i < imgs.length; i++) {
+    img = imgs[i];
+    // center an image if it is the only element of its parent
+    if (img.parentElement.childElementCount === 1)
+      img.parentElement.style.textAlign = 'center';
+  }
+};
+</script>
+
+
+
+
+
+<style type="text/css">
+body, td {
+   font-family: sans-serif;
+   background-color: white;
+   font-size: 13px;
+}
+
+body {
+  max-width: 800px;
+  margin: auto;
+  padding: 1em;
+  line-height: 20px;
+}
+
+tt, code, pre {
+   font-family: 'DejaVu Sans Mono', 'Droid Sans Mono', 'Lucida Console', Consolas, Monaco, monospace;
+}
+
+h1 {
+   font-size:2.2em;
+}
+
+h2 {
+   font-size:1.8em;
+}
+
+h3 {
+   font-size:1.4em;
+}
+
+h4 {
+   font-size:1.0em;
+}
+
+h5 {
+   font-size:0.9em;
+}
+
+h6 {
+   font-size:0.8em;
+}
+
+a:visited {
+   color: rgb(50%, 0%, 50%);
+}
+
+pre, img {
+  max-width: 100%;
+}
+pre {
+  overflow-x: auto;
+}
+pre code {
+   display: block; padding: 0.5em;
+}
+
+code {
+  font-size: 92%;
+  border: 1px solid #ccc;
+}
+
+code[class] {
+  background-color: #F8F8F8;
+}
+
+table, td, th {
+  border: none;
+}
+
+blockquote {
+   color:#666666;
+   margin:0;
+   padding-left: 1em;
+   border-left: 0.5em #EEE solid;
+}
+
+hr {
+   height: 0px;
+   border-bottom: none;
+   border-top-width: thin;
+   border-top-style: dotted;
+   border-top-color: #999999;
+}
+
+@media print {
+   * {
+      background: transparent !important;
+      color: black !important;
+      filter:none !important;
+      -ms-filter: none !important;
+   }
+
+   body {
+      font-size:12pt;
+      max-width:100%;
+   }
+
+   a, a:visited {
+      text-decoration: underline;
+   }
+
+   hr {
+      visibility: hidden;
+      page-break-before: always;
+   }
+
+   pre, blockquote {
+      padding-right: 1em;
+      page-break-inside: avoid;
+   }
+
+   tr, img {
+      page-break-inside: avoid;
+   }
+
+   img {
+      max-width: 100% !important;
+   }
+
+   @page :left {
+      margin: 15mm 20mm 15mm 10mm;
+   }
+
+   @page :right {
+      margin: 15mm 10mm 15mm 20mm;
+   }
+
+   p, h2, h3 {
+      orphans: 3; widows: 3;
+   }
+
+   h2, h3 {
+      page-break-after: avoid;
+   }
+}
+</style>
+
+
+
+</head>
+
+<body>
+<h2>Reproducible Research Project 1</h2>
+
+<h4>1) Code for reading in the dataset and/or processing the data</h4>
+
+<p>Load the data</p>
+
+<pre><code>fitdata&lt;-read.csv(&quot;activity.csv&quot;)
+</code></pre>
+
+<p>Process/transform the data into a suitable format for analysis</p>
+
+<pre><code>fitdata$date&lt;-as.Date(as.character(fitdata$date), 
+                   format = &quot;%Y-%m-%d&quot;)
+fitdataNB&lt;-na.omit(fitdata)
+</code></pre>
+
+<h4>2) Histogram of the total number of steps taken each day</h4>
+
+<p>Calculate the total number of steps taken per day</p>
+
+<pre><code>library(plyr)
+daydata&lt;- ddply(fitdataNB,.(date),summarize,TotalSteps=sum(steps))
+</code></pre>
+
+<p>Make a histogram of the total number of steps taken each day</p>
+
+<pre><code>hist(daydata$TotalSteps, main = &quot;Histogram of steps per day&quot;, xlab = &quot;Total Steps per Day&quot;)
+</code></pre>
+
+<p><img src="PA1_template_files/figure-markdown_strict/unnamed-chunk-4-1.png" alt=""/></p>
+
+<h4>3) Mean and median number of steps taken each day</h4>
+
+<p>Calculate and report the mean and median of the total number of steps
+taken per day</p>
+
+<pre><code>meansteps = mean(daydata$TotalSteps)
+mediansteps = median(daydata$TotalSteps)
+cat(&quot;Mean: &quot;,  meansteps, &quot;\nMedian: &quot;, mediansteps)
+
+## Mean:  10766.19 
+## Median:  10765
+</code></pre>
+
+<h4>4) Time series plot of the average number of steps taken</h4>
+
+<p>Make a time series plot of the 5-minute interval and the average number
+of steps taken, averaged across all days</p>
+
+<pre><code>plot(daydata, type = &quot;l&quot;, main = &quot;Total Steps by Day&quot;)
+</code></pre>
+
+<p><img src="PA1_template_files/figure-markdown_strict/unnamed-chunk-6-1.png" alt=""/></p>
+
+<h4>5)The 5-minute interval that, on average, contains the maximum number of steps</h4>
+
+<p>Which 5-minute interval, on average across all the days in the dataset,
+contains the maximum number of steps?</p>
+
+<pre><code>intervalavg&lt;-ddply(fitdataNB, .(interval), summarize, AvgSteps = mean(steps))
+maxsteps = which.max(intervalavg$AvgSteps)
+cat(&quot;Higest average interval: &quot;, intervalavg$interval[maxsteps])
+
+## Higest average interval:  835
+</code></pre>
+
+<h4>6) Code to describe and show a strategy for imputing missing data</h4>
+
+<p>Calculate and report the total number of missing values in the dataset</p>
+
+<pre><code>NAcount = sum(is.na(fitdata$steps))
+print(NAcount)
+
+## [1] 2304
+</code></pre>
+
+<p>Devise a strategy for filling in all of the missing values in the
+dataset. Use the mean for the 5-minute interval. Create a new dataset
+that is equal to the original dataset but with the missing data filled
+in.</p>
+
+<pre><code>library(dplyr)
+fitdata2&lt;-fitdata %&gt;% group_by(interval) %&gt;% mutate(steps = ifelse(is.na(steps), mean(steps, na.rm = TRUE), steps)) %&gt;% ungroup
+daydata2&lt;- ddply(fitdata2,.(date),summarize,TotalSteps=sum(steps))
+</code></pre>
+
+<h4>7) Histogram of the total number of steps taken each day after missing values are imputed</h4>
+
+<p>Make a histogram of the total number of steps taken each day</p>
+
+<pre><code>hist(daydata2$TotalSteps, main = &quot;Histogram of steps per day&quot;, xlab = &quot;Total Steps per Day&quot;)
+</code></pre>
+
+<p><img src="PA1_template_files/figure-markdown_strict/unnamed-chunk-10-1.png" alt=""/></p>
+
+<p>Calculate and report the mean and median total number of steps taken per
+day</p>
+
+<pre><code>meansteps = mean(daydata2$TotalSteps)
+mediansteps = median(daydata2$TotalSteps)
+cat(&quot;Mean: &quot;,  meansteps, &quot;\nMedian: &quot;, mediansteps)
+
+## Mean:  10766.19 
+## Median:  10766.19
+</code></pre>
+
+<h4>8) Panel plot comparing the average number of steps taken per 5-minute interval across weekdays and weekends</h4>
+
+<p>Create a new factor variable in the dataset with two levels - &ldquo;weekday&rdquo;
+and &ldquo;weekend&rdquo;</p>
+
+<pre><code>byweekday&lt;-mutate(fitdata2,WD = factor(ifelse(weekdays(fitdata2$date) %in% c(&quot;Saturday&quot;, &quot;Sunday&quot;),&quot;Weekend&quot;,&quot;Weekday&quot;)))
+</code></pre>
+
+<p>Make a panel plot containing a time series plot of the 5-minute interval
+and the average number of steps taken, averaged acrossed all weekdays or
+weekend days</p>
+
+<pre><code>library(lattice)
+intervaldata&lt;- ddply(byweekday,c(.(interval),.(WD)),summarize,AvgSteps=mean(steps))
+xyplot(AvgSteps ~ interval | WD, data = intervaldata, layout = c(1,2), type = &quot;l&quot;)
+</code></pre>
+
+<p><img src="PA1_template_files/figure-markdown_strict/unnamed-chunk-13-1.png" alt=""/></p>
+
+</body>
+
+</html>
